@@ -11,6 +11,7 @@ package otgservice.Interface;
 public interface IObservable {
     
     void close();
+    void sendData(String data);
     void notifyObserver(String data);
     
 }

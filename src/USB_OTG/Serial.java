@@ -56,7 +56,9 @@ public class Serial implements IObservable, SerialPortEventListener {
     public void serialEvent(SerialPortEvent serialPortEvent) {
         if (serialPortEvent.isRXCHAR() && serialPortEvent.getEventValue() > 0) {
             try {
-                notifyObserver(serialPort.readString());
+                if (serialPort.getInputBufferBytesCount() > 0) {
+                    notifyObserver(serialPort.readString());
+                }
             }
             catch (SerialPortException ex) {
                 System.out.println("Serial.serialEvent");
@@ -68,6 +70,17 @@ public class Serial implements IObservable, SerialPortEventListener {
     @Override
     public void notifyObserver(String data) {
         obs.update(data);
+    }
+
+    @Override
+    public void sendData(String data) {
+        try {
+            serialPort.writeString(data);
+        }
+        catch (SerialPortException ex) {
+            System.out.println("Serial.serialEvent");
+            throw new RuntimeException(ex);
+        }
     }
 
 }
