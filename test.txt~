@@ -1,9 +1,0 @@
-auto wlan0
-iface wlan0 inet dhcp
-	wpa-ssid "Samsung"
-	wpa-psk "123"
-qweqweqwe
-qweqwe
-qwe
-qweqwe
-qweqweqwe
