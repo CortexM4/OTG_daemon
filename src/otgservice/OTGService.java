@@ -5,29 +5,54 @@
  */
 package otgservice;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author crtx
  */
 public class OTGService {
 
+    private static final Logger log = Logger.getLogger(OTGService.class.getName());
+    static private boolean shutdownFlag = false;
+
     public static void main(String[] args) {
 
-        System.out.println("Listener created");
-        Connector listener = new Connector();
+        log.info("Start USB-OTG Service");
+        registerShutdownHook();
         
-
+        
+        Connector listener = new Connector();
         try {
-            Thread.sleep(20000);
+            while (false == shutdownFlag) {
+                Thread.sleep(1000);
+            }
         }
         catch (InterruptedException ex) {
-            System.out.println("Err " + ex.getMessage());
+            log.log(Level.SEVERE, null, ex);
         }
         finally {
-            System.out.println("Listener closed");
             listener.Close_listener();
+            log.info("Stop USB-OTG Service");
         }
 
     }
 
+    static public void setShutdownFlag() {shutdownFlag = true;}
+    
+    private static void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(
+                new Thread() {
+                    public void run() {
+                        OTGService.setShutdownFlag();
+                    }
+                }
+        );
+    }
+      
 }

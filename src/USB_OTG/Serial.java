@@ -5,6 +5,8 @@
  */
 package USB_OTG;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import otgservice.Interface.*;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
@@ -17,6 +19,7 @@ import jssc.SerialPortException;
  */
 public class Serial implements IObservable, SerialPortEventListener {
 
+    private static final Logger log = Logger.getLogger(Serial.class.getName());
     SerialPort serialPort;
     private IObserver obs;
 
@@ -32,12 +35,12 @@ public class Serial implements IObservable, SerialPortEventListener {
 
             serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN
                     | SerialPort.FLOWCONTROL_RTSCTS_OUT);
-            serialPort.addEventListener(this, SerialPort.MASK_RXCHAR);
 
+            serialPort.addEventListener(this, SerialPort.MASK_RXCHAR);
+            
         }
         catch (SerialPortException ex) {
-            System.out.println("Serial.Serial");
-            throw new RuntimeException(ex);
+            log.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -47,8 +50,7 @@ public class Serial implements IObservable, SerialPortEventListener {
             serialPort.closePort();
         }
         catch (SerialPortException ex) {
-            System.out.println("Serial.Close");
-            throw new RuntimeException(ex);
+            log.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -61,8 +63,7 @@ public class Serial implements IObservable, SerialPortEventListener {
                 }
             }
             catch (SerialPortException ex) {
-                System.out.println("Serial.serialEvent");
-                throw new RuntimeException(ex);
+                log.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -78,8 +79,7 @@ public class Serial implements IObservable, SerialPortEventListener {
             serialPort.writeString(data);
         }
         catch (SerialPortException ex) {
-            System.out.println("Serial.serialEvent");
-            throw new RuntimeException(ex);
+            log.log(Level.SEVERE, null, ex);
         }
     }
 

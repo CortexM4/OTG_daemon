@@ -1,0 +1,1 @@
+KERNEL=="ttyGS0", SYMLINK+="ttyDev", MODE="0666"

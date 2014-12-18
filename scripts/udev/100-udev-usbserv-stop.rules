@@ -1,0 +1,1 @@
+ACTION=="remove", KERNEL=="ttyGS0", RUN+="/home/crtx/usb_serv/scripts/stop.sh"

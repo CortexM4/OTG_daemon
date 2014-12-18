@@ -17,12 +17,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import otgservice.Interface.*;
 
+
 /**
  *
  * @author crtx
  */
 public class Connector implements IObserver {
 
+    private static final Logger log = Logger.getLogger(Connector.class.getName());
     private IObservable connector;
     private final String file = "/etc/network/interfaces";
 
@@ -57,11 +59,11 @@ public class Connector implements IObserver {
                 while ((line = reader.readLine()) != null) {
                     String essid;
                     essid = line.trim().substring(6).replaceAll("\"", "");
-                    connector.sendData(essid);
+                    connector.sendData(essid+"\n");
                 }
             }
             catch (IOException ex) {
-                Logger.getLogger(Connector.class.getName()).log(Level.SEVERE, null, ex);
+                log.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -73,13 +75,11 @@ public class Connector implements IObserver {
             String essid = data.substring(index_net + 1, index_pwd);
             String pwd = data.substring(index_pwd + 1);
 
-            System.out.println("Network param: " + essid + " " + pwd);
-
             /* Чтение файла конфигурации сети и внесение новых данных */
             try {
                 BufferedReader br = new BufferedReader(new InputStreamReader(
                         new FileInputStream(file)));
-                String tmp = null; // буфер чтения
+                String tmp; // буфер чтения
                 StringBuilder ost = new StringBuilder();
                 while ((tmp = br.readLine()) != null) {
                     int i = tmp.indexOf("wpa-ssid");
@@ -100,23 +100,43 @@ public class Connector implements IObserver {
                 fw.close();
             }
             catch (IOException ex) {
-                Logger.getLogger(Connector.class.getName()).log(Level.SEVERE, null, ex);
+                log.log(Level.SEVERE, null, ex);
             }
         }
 
         /* Перезапуск сети */
         if (data.regionMatches(0, "TRYC", 0, 4)) {
+            boolean try_ip = false;                     // Уверен, что есть способ элегантнее, но да ладно
+            String[] cmd_try_ip = {
+                "/bin/sh",
+                "-c",
+                "ifconfig wlan0 | grep \"inet addr\""
+            };
             Runtime runtime = Runtime.getRuntime();
             try {
                 Process process = runtime.exec("/etc/init.d/networking restart");
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    System.out.println(line);
+                    log.info(line);
+                }
+                
+                process = runtime.exec(cmd_try_ip);
+                bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                while ((line = bufferedReader.readLine()) != null) {
+                    log.info(line);
+                    try_ip = true;
+                }
+                
+                if(try_ip)
+                    connector.sendData("true");         // Удачное получение ip адреса. Посылаем хосту
+                else {
+                    connector.sendData("false");        // Какая-то фигня
+                    log.info("Something wrong. Cannot assign ip address");
                 }
             }
             catch (IOException ex) {
-                Logger.getLogger(Connector.class.getName()).log(Level.SEVERE, null, ex);
+                log.log(Level.SEVERE, null, ex);
             }
         }
 

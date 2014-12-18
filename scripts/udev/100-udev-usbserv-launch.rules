@@ -1,0 +1,1 @@
+ACTION=="add", KERNEL=="ttyGS0", RUN+="/home/crtx/usb_serv/scripts/launch.sh"
