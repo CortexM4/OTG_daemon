@@ -70,10 +70,10 @@ public class Connector implements IObserver {
         /* Запись конфигурации в /etc/network/interfaces */
         if (data.regionMatches(0, "WLAN", 0, 4)) {
             data = data.replaceAll("\n", "");                       // Хер знает откуда там перенос строки, но ИНОГДА появляется
-            int index_net = data.indexOf(" ", 0);
-            int index_pwd = data.indexOf(" ", index_net + 1);
-            String essid = data.substring(index_net + 1, index_pwd);
-            String pwd = data.substring(index_pwd + 1);
+            int index_net = data.indexOf("wl:", 0);
+            int index_pwd = data.indexOf("pw:", index_net + 1);
+            String essid = data.substring(index_net + 3, index_pwd);
+            String pwd = data.substring(index_pwd + 3);
 
             /* Чтение файла конфигурации сети и внесение новых данных */
             try {
